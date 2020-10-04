@@ -1,14 +1,12 @@
 package main
 
 import (
-	"container/list"
 	"fmt"
 	"math/big"
 	"sort"
 )
 
 func main() {
-
 	top := 9
 	odds := make([]int, (top/2 + top%2))
 	evens := make([]int, (top / 2))
@@ -21,7 +19,6 @@ func main() {
 
 	oddlist := permutations(odds)
 	evenlist := permutations(evens)
-
 	solutions := [][]int{}
 
 	for _, odd := range oddlist {
@@ -40,7 +37,6 @@ func main() {
 		}
 	}
 
-	// sort.Sort(ByNumericOrder(solutions))
 	sort.SliceStable(solutions, func(i, j int) bool {
 		for k := 0; k < len(solutions[i]); k++ {
 			if solutions[i][k] > solutions[j][k] {
@@ -59,25 +55,22 @@ func main() {
 	}
 }
 
-func permutations(a []int) [][]int {
-	l := list.New()
-	heapPermutation(a, len(a), len(a), l)
-	retval := [][]int{}
-	for e := l.Front(); e != nil; e = e.Next() {
-		retval = append(retval, e.Value.([]int))
+func permutations(a []int) (retval [][]int) {
+	storeperm := func(perm []int) {
+		retval = append(retval, perm)
 	}
-	return retval
+	heapPermutation(a, len(a), len(a), storeperm)
+	return
 }
 
-func heapPermutation(a []int, size int, n int, l *list.List) {
+func heapPermutation(a []int, size int, n int, store func(a []int)) {
 	if size == 1 {
 		permutation := make([]int, n)
 		copy(permutation, a)
-		l.PushBack(permutation)
+		store(permutation)
 	}
 	for i := 0; i < size; i++ {
-		heapPermutation(a, size-1, n, l)
-
+		heapPermutation(a, size-1, n, store)
 		if size%2 == 1 {
 			temp := a[0]
 			a[0] = a[size-1]
@@ -103,7 +96,6 @@ func interleave(a []int, b []int) []int {
 			j++
 		}
 	}
-
 	return retval
 }
 
