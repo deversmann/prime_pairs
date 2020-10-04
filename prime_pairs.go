@@ -3,11 +3,23 @@ package main
 import (
 	"fmt"
 	"math/big"
+	"os"
 	"sort"
+	"strconv"
+	"time"
 )
 
 func main() {
+	start := time.Now()
 	top := 9
+	if len(os.Args) > 1 {
+		i, err := strconv.Atoi(os.Args[1])
+		if err != nil || i < 2 || i > 15 {
+			fmt.Println("Single optional argument needs to be an integer from 2 to 15.  Defaulting to 9.")
+		} else {
+			top = i
+		}
+	}
 	odds := make([]int, (top/2 + top%2))
 	evens := make([]int, (top / 2))
 	for i := range odds {
@@ -37,7 +49,9 @@ func main() {
 		}
 	}
 
-	sort.SliceStable(solutions, func(i, j int) bool {
+	endCompute := time.Now()
+
+	sort.Slice(solutions, func(i, j int) bool {
 		for k := 0; k < len(solutions[i]); k++ {
 			if solutions[i][k] > solutions[j][k] {
 				return false
@@ -49,38 +63,39 @@ func main() {
 		return true
 	})
 
-	fmt.Printf("There are %v solutions:\n", len(solutions))
+	fmt.Printf("There are %v solutions for the first %v positive integers:\n", len(solutions), top)
 	for _, solution := range solutions {
 		fmt.Println(fmt.Sprint(solution))
 	}
+	fmt.Printf("End of the %v solutions for the first %v positive integers\n", len(solutions), top)
+	complete := time.Now()
+	fmt.Printf("Compute took %v not including the additional %v to sort and display", endCompute.Sub(start), complete.Sub(endCompute))
 }
 
 func permutations(a []int) (retval [][]int) {
-	storeperm := func(perm []int) {
-		retval = append(retval, perm)
-	}
-	heapPermutation(a, len(a), len(a), storeperm)
-	return
-}
-
-func heapPermutation(a []int, size int, n int, store func(a []int)) {
-	if size == 1 {
-		permutation := make([]int, n)
-		copy(permutation, a)
-		store(permutation)
-	}
-	for i := 0; i < size; i++ {
-		heapPermutation(a, size-1, n, store)
-		if size%2 == 1 {
-			temp := a[0]
-			a[0] = a[size-1]
-			a[size-1] = temp
+	var heapPermutation func([]int, int)
+	heapPermutation = func(a []int, n int) {
+		if n == 1 {
+			permutation := make([]int, len(a))
+			copy(permutation, a)
+			retval = append(retval, permutation)
 		} else {
-			temp := a[i]
-			a[i] = a[size-1]
-			a[size-1] = temp
+			for i := 0; i < n; i++ {
+				heapPermutation(a, n-1)
+				if n%2 == 1 {
+					temp := a[i]
+					a[i] = a[n-1]
+					a[n-1] = temp
+				} else {
+					temp := a[0]
+					a[0] = a[n-1]
+					a[n-1] = temp
+				}
+			}
 		}
 	}
+	heapPermutation(a, len(a))
+	return
 }
 
 func interleave(a []int, b []int) []int {
