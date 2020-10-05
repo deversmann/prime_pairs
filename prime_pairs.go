@@ -69,7 +69,7 @@ func main() {
 	}
 	fmt.Printf("End of the %v solutions for the first %v positive integers\n", len(solutions), top)
 	complete := time.Now()
-	fmt.Printf("Compute took %v not including the additional %v to sort and display", endCompute.Sub(start), complete.Sub(endCompute))
+	fmt.Printf("Compute took %v not including the additional %v to sort and display\n", endCompute.Sub(start), complete.Sub(endCompute))
 }
 
 func permutations(a []int) (retval [][]int) {
